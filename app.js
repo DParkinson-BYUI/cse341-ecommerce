@@ -18,6 +18,6 @@ app
   .use('/admin', adminData.routes)
   .use(shopRoutes)
   .use((req, res, next) => {
-    res.status(404).render('404', { pageTitle: 'Page Not Found' });
+    res.status(404).render('404', { pageTitle: 'Page Not Found', path: '/404' });
   })  
   .listen(PORT, () => console.log(`Listening on ${PORT}`));  

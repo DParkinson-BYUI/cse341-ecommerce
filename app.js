@@ -8,6 +8,7 @@ const app = express();
 
 // Route setup. You can implement more in the future!
 const adminData = require('./routes/admin');
+
 const shopRoutes = require('./routes/shop');
 
 app

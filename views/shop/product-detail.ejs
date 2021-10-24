@@ -9,10 +9,16 @@
             <div class="image">
                 <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
             </div>
-            <h2><%= product.price %></h2>
-            <p><%= product.description %></p>
-            <% if (isAuthenticated) { %>
-                <%- include('../includes/add-to-cart.ejs', {product: product}) %>
-            <% } %>
+            <div class="card__content">
+                <h2><%= product.price %></h2>
+                <p><%= product.description %></p>
+                <p class="product__stat"><%= product.height %> x <%= product.width %> x <%= product.depth %> inches</p>
+                <p class="product__stat"><%= product.weight %> ounces</p>            
+            </div>
+            <div class="card__actions">
+                <% if (isAuthenticated) { %>
+                    <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+                <% } %>
+            </div>
         </main>
         <%- include('../includes/end.ejs') %>

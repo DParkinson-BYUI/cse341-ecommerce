@@ -30,6 +30,9 @@ router.post(
 router.post(
     '/signup',
     [
+    check('firstName', 'First Name is required').isAlpha().trim(),
+    check('lastName', 'Last Name is required').isAlpha().trim(),
+    check('phone', 'A valid phone number is required').isMobilePhone().trim(),      
     check('email')
         .isEmail()
         .withMessage('Please enter a valid email.')
@@ -69,10 +72,23 @@ router.post('/logout', authController.postLogout);
 
 router.get('/reset', authController.getReset);
 
-router.post('/reset', authController.postReset);
+router.post('/reset',
+  [
+    check('email')
+      .isEmail()
+      .withMessage('Please enter a valid email.')
+      .normalizeEmail()
+  ], authController.postReset);
 
 router.get('/reset/:token', authController.getNewPassword);
 
-router.post('/new-password', authController.postNewPassword);
+router.post('/new-password', 
+  [
+    body('password', 'Please enter a password with only numbers and text and at least 5 characters')
+      .isLength({min:5})
+      .isAlphanumeric()
+      .trim()
+  ], 
+  authController.postNewPassword);
 
 module.exports = router;

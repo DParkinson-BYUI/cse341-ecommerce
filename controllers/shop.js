@@ -38,6 +38,8 @@ exports.getProduct = (req, res, next) => {
 exports.getIndex = (req, res, next) => {
   Product.find()
     .then(products => {
+      //let miniList = getRandom(products, 3)
+
       res.render('shop/index', {
         prods: products,
         pageTitle: 'Shop',
@@ -100,6 +102,33 @@ exports.postCartDeleteProduct = (req, res, next) => {
     });
 };
 
+exports.postCartIncrementProduct = (req, res, next) => {
+  const prodId = req.body.productId;  
+  req.user.incrementProduct(prodId)
+    .then(result => {
+      res.redirect('/cart');
+    })
+    .catch(err => {
+      const error = new Error(err);
+      console.log('Error: ' + err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+}
+
+exports.postCartDecrementProduct = (req, res, next) => {
+  const prodId = req.body.productId;  
+  req.user.decrementProduct(prodId)
+    .then(result => {
+      res.redirect('/cart');
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+}
+
 exports.postOrder = (req, res, next) => {
   req.user
     .populate('cart.items.productId')
@@ -107,14 +136,18 @@ exports.postOrder = (req, res, next) => {
       const products = user.cart.items.map(i => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
+
+      var total = 0;
+      products.forEach(x => total = total + (x.quantity * x.product.price))     
       const order = new Order({
         user: {
           email: req.user.email,
           userId: req.user
         },
-        products: products
+        products: products,
+        totalCost: total.toFixed(2)
       });
-      return order.save();
+      order.save();
     })
     .then(result => {
       return req.user.clearCart();
@@ -144,3 +177,21 @@ exports.getOrders = (req, res, next) => {
       return next(error);
     });
 };
+
+exports.throwError = (req, res, next) => {
+  throw new Error("Error: This is a test error.")
+}
+
+function getRandom(arr, n) {
+  var result = new Array(n),
+      len = arr.length,
+      taken = new Array(len);
+  if (n > len)
+      throw new RangeError("getRandom: more elements taken than available");
+  while (n--) {
+      var x = Math.floor(Math.random() * len);
+      result[n] = arr[x in taken ? taken[x] : x];
+      taken[x] = --len in taken ? taken[len] : len;
+  }
+  return result;
+}

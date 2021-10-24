@@ -47,6 +47,34 @@
                     id="description" 
                     rows="5"><% if (editing || hasError) { %><%= product.description %><% } %></textarea>
             </div>
+            <div class="form-control">
+                <label for="height">Height (inches)</label>
+                <input 
+                    class="<%= validationErrors.find(e=> e.param === 'height') ? 'invalid' : '' %>"
+                    type="number" name="height" id="height" step=".25"
+                    value="<% if (editing || hasError) { %><%= product.height %><% } %>">
+              </div>
+              <div class="form-control">
+                <label for="width">Width (inches)</label>
+                <input 
+                    class="<%= validationErrors.find(e=> e.param === 'width') ? 'invalid' : '' %>"
+                    type="number" name="width" id="width" step=".25" 
+                    value="<% if (editing || hasError) { %><%= product.width %><% } %>">
+              </div>
+              <div class="form-control">
+                <label for="depth">Depth (inches)</label>
+                <input 
+                    class="<%= validationErrors.find(e=> e.param === 'depth') ? 'invalid' : '' %>"
+                    type="number" name="depth" id="depth" step=".25" 
+                    value="<% if (editing || hasError) { %><%= product.depth %><% } %>">
+              </div>
+              <div class="form-control">
+                <label for="weight">Weight (ounces)</label>
+                <input 
+                    class="<%= validationErrors.find(e=> e.param === 'weight') ? 'invalid' : '' %>"
+                    type="number" name="weight" id="weight" step=".1"
+                    value="<% if (editing || hasError) { %><%= product.weight %><% } %>">
+              </div>            
             <% if (editing) { %>
                 <input type="hidden" value="<%= product._id %>" name="productId">
             <% } %>

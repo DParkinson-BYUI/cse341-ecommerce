@@ -18,6 +18,10 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
+  const height = req.body.height;
+  const width = req.body.width;
+  const depth = req.body.depth;
+  const weight = req.body.weight;  
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -31,7 +35,11 @@ exports.postAddProduct = (req, res, next) => {
         title: title,
         imageUrl: imageUrl,
         price: price,
-        description: description
+        description: description,
+        height: height,
+        width: width,
+        depth: depth, 
+        weight: weight        
       },
       errorMessage: errors.array()[0].msg,
       validationErrors: errors.array()
@@ -43,6 +51,10 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
+    height: height,
+    width: width,
+    depth: depth,
+    weight: weight,    
     userId: req.user
   });
   product
@@ -93,6 +105,11 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
+  const updatedHeight = req.body.height;
+  const updatedWidth = req.body.width;
+  const updatedDepth = req.body.depth;
+  const updatedWeight = req.body.weight;  
+  const editMode = true;
 
   const errors = validationResult(req);
 
@@ -100,13 +117,17 @@ exports.postEditProduct = (req, res, next) => {
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
-      editing: true,
+      editing: editMode,
       hasError: true,
       product: {
         title: updatedTitle,
         imageUrl: updatedImageUrl,
         price: updatedPrice,
         description: updatedDesc,
+        height: updatedHeight,
+        width: updatedWidth,
+        depth: updatedDepth, 
+        weight: updatedWeight,        
         _id: prodId
       },
       errorMessage: errors.array()[0].msg,
@@ -123,6 +144,10 @@ exports.postEditProduct = (req, res, next) => {
       product.price = updatedPrice;
       product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
+      product.height = updatedHeight;
+      product.width = updatedWidth;
+      product.depth = updatedDepth;
+      product.weight = updatedWeight;      
       return product.save().then(result => {
         console.log('UPDATED PRODUCT!');
         res.redirect('/admin/products');

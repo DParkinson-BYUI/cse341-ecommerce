@@ -47,6 +47,9 @@ exports.getSignup = (req, res, next) => {
     pageTitle: 'Signup',
     errorMessage: message,
     oldInput: {
+      firstName: '',
+      lastName: '',
+      phone: '',      
       email: '',
       password: '',
       confirmPassword: ''
@@ -111,7 +114,7 @@ exports.postLogin = (req, res, next) => {
         })
         .catch(err => {
           console.log(err);
-          res.redirect('/login');
+          res.redirect('auth/login');
         });
     })
     .catch(err => {
@@ -122,8 +125,12 @@ exports.postLogin = (req, res, next) => {
 };
 
 exports.postSignup = (req, res, next) => {
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const phone = req.body.phone;  
   const email = req.body.email;
   const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -133,6 +140,9 @@ exports.postSignup = (req, res, next) => {
       pageTitle: 'Signup',
       errorMessage: errors.array()[0].msg,
       oldInput: {
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,        
         email: email,
         password: password,
         confirmPassword: req.body.confirmPassword
@@ -145,6 +155,9 @@ exports.postSignup = (req, res, next) => {
     .hash(password, 12)
     .then(hashedPassword => {
       const user = new User({
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,        
         email: email,
         password: hashedPassword,
         cart: { items: [] }
@@ -169,7 +182,9 @@ exports.postSignup = (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy(err => {
-    console.log(err);
+    if (err) {
+      console.log('Logout error: ' + err);
+    }
     res.redirect('/');
   });
 };
@@ -184,11 +199,28 @@ exports.getReset = (req, res, next) => {
   res.render('auth/reset', {
     path: '/reset',
     pageTitle: 'Reset Password',
-    errorMessage: message
+    errorMessage: message,
+    oldInput: {      
+      email: ''        
+    },
+    validationErrors: []    
   });
 };
 
 exports.postReset = (req, res, next) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()) {   
+    return res.render('auth/reset', {
+      pageTitle: 'Reset',
+      path: '/reset',
+      errorMessage: errors.array()[0].msg,
+      oldInput: {      
+        email: req.body.email          
+      },
+      validationErrors: errors.array()
+    });
+  }
+
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
       console.log(err);
@@ -206,15 +238,16 @@ exports.postReset = (req, res, next) => {
         return user.save();
       })
       .then(result => {
+        const emailBody = `<p>You requested a password reset</p>
+        <p>Click this <a href="${process.env.HOST_URL}/reset/${token}">link</a> to set a new password</p>
+      `;
+      console.log(emailBody);
         res.redirect('/');
-        transporter.sendMail({
+        return transporter.sendMail({
           to: req.body.email,
           from: 'drew.parkinson@a-dec.com',
           subject: 'Password reset!',
-          html: `
-            <p>You requested a password reset</p>
-            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password</p>
-          `
+          html: emailBody
         });
       })
       .catch(err => {
@@ -254,6 +287,22 @@ exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
   const userId = req.body.userId;
   const passwordToken = req.body.passwordToken;
+
+  const errors = validationResult(req);
+  if(!errors.isEmpty()) {  
+    res.render('auth/new-password', {
+      pageTitle: 'New Password',
+      path: '/new-password',
+      errorMessage: errors.array()[0].msg,
+      userId: userId,
+      passwordToken: passwordToken,
+      oldInput: {      
+        email: newPassword         
+      },
+      validationErrors: errors.array()
+    });
+  }
+
   let resetUser;
 
   User.findOne({

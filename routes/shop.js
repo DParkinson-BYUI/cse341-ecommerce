@@ -23,4 +23,10 @@ router.post('/create-order', isAuth, shopController.postOrder);
 
 router.get('/orders', isAuth, shopController.getOrders);
 
+router.post('/cart-product-increment', isAuth, shopController.postCartIncrementProduct);
+
+router.post('/cart-product-decrement', isAuth, shopController.postCartDecrementProduct);
+
+router.get('/throw-error', shopController.throwError);
+
 module.exports = router;
